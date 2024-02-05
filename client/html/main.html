@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>JavaScript Table</title>
+  <link rel="stylesheet"href="../css/main.css" /> 
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+  <script src="../js/client.js"></script>
+</head>
+<body>
+<script>
+		// Function to be executed onclick 
+		var counter = 0; // check if you need to remove the image or add it
+		var lastTdId; // the id of the td that we need to remove the image from
+		let td; // current td to add the image
+		let lastTd; // td to remove the image from
+		let playerTurn = 0; // decide who plays first
+		let isMyTurn;
+
+function moveImage(tdId)
+{
+			//if its not my turn get out
+			//if (!isMyTurn == "True") return;
+			td = document.getElementById(tdId);
+			
+			if (counter%2 == 1 &&!td.classList[0].includes("image")){
+				
+				//check if the location of the new image is legal
+				if (!checkIfLocationOk(lastTdId.slice(-2),tdId.slice(-2)))
+					return;
+				
+				//let td = document.getElementById(tdId);
+				//let lastTd = document.getElementById(lastTdId);
+				
+				//add the image to its new location
+				//td.classList.remove('green');
+				//td.classList.add(lastTd.classList[0]);
+							
+				// remove the image from the last location
+				//lastTd.classList.remove(lastTd.classList[0]);
+				//lastTd.classList.add('green');
+				
+				counter++;
+				
+				
+				//send the move to the server
+				callServer("playTurn",lastTdId.toString()+tdId.toString(),playerTurn, function(response) {updateBoard()});
+			}
+			else if(counter%2 == 0&& td.classList[0].includes("image")){
+				lastTdId = tdId;
+				counter++;
+			}
+}
+
+function checkMyTurn() {
+	callServer("isMyTurn","",playerTurn, function(response1) {
+		if (response1 == "False")
+		{
+			callServer("getTurn","",playerTurn, function(response) {
+				if (response == "still waiting") return;
+				td = document.getElementById(response[0]+response[1]);
+				lastTd = document.getElementById(response[2]+response[3]);
+			});
+		}
+	});
+			
+}
+
+function updateBoard(){
+	callServer("getBoard","",playerTurn, function(response) {
+		if (response == "")
+			return;
+		let boardString = response;
+		let boardArray = boardString.split(" ")
+		let counter = 0
+		for (var i = 0; i < 10; i++) {
+			for (var j = 0; j < 10; j++) {
+				let td = document.getElementById(i.toString()+j.toString());
+				td.className = '';
+				td.classList.add(boardArray[counter]);
+				counter++;
+			}
+		}
+	});
+}
+
+setInterval(updateBoard, 1000);
+
+function playTurn(tdId) {
+
+			//send the move to the other player
+			callServer("isMyTurn","",playerTurn, function(response) {
+				isMyTurn = response;
+				if (isMyTurn == "True") {
+					moveImage(tdId);
+				}
+				else{
+					alert("waiting for opponent to play");
+				}
+		});
+	}
+
+	function main (){
+		 createTable(10,10);
+		 //decide who plays first
+		 callServer("getPlayerId", "", "", function(response) {
+			playerTurn = response;
+		});
+	}
+	
+main();
+</script>
+
+</body>
+</html>

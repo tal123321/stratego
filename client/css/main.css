@@ -1,0 +1,64 @@
+  
+    table {
+      border-collapse: collapse;
+    }
+    td {
+	
+	
+	
+		border: 1px solid;
+        width: 75px;
+        height: 75px;
+        box-sizing: border-box;
+    }
+	.green { background: #00FF00; } /* Green background for green squares */
+	.blue { background: #0000FF; } /* Blue background for blue squares */
+	img{
+		width: 50px;
+		height: 50px;
+		background-size: cover; /* or use 'contain' based on your preference */
+		display:table-cell;	
+	}
+	.image1 {
+        background-image: url('../images/image1.jpg');
+    }
+		
+	.image2 {
+        background-image: url('../images/image2.jpg');
+	}
+	
+	.image3 {
+        background-image: url('../images/image3.jpg');
+    }
+		
+	.image4 {
+        background-image: url('../images/image4.jpg');
+	}
+	.image5 {
+        background-image: url('../images/image5.jpg');
+    }
+		
+	.image6 {
+        background-image: url('../images/image6.jpg');
+	}
+	.image7 {
+        background-image: url('../images/image7.jpg');
+    }
+		
+	.image8 {
+        background-image: url('../images/image8.jpg');
+	}
+	.image9 {
+        background-image: url('../images/image9.jpg');
+    }
+		
+	.flag {
+        background-image: url('../images/flag.jpg');
+    }
+		
+	.bomb {
+        background-image: url('../images/bomb.jpg');
+	}
+	.enemy {
+        background-image: url('../images/enemy.jpg');
+	}
