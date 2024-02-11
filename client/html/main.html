@@ -66,8 +66,12 @@ function updateBoard(){
 		for (var i = 0; i < 10; i++) {
 			for (var j = 0; j < 10; j++) {
 				let td = document.getElementById(i.toString()+j.toString());
+				td_class = boardArray[counter];
 				td.className = '';
-				td.classList.add(boardArray[counter]);
+				if (td_class!="blue") {
+					td.classList.add("board_piece");
+				}
+				td.classList.add(td_class);
 				counter++;
 			}
 		}

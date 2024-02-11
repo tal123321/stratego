@@ -51,7 +51,7 @@ class MyHandler(http.server.BaseHTTPRequestHandler):
                 whoseTurn = 3 - int(player_id)
         elif action == "getPlayerId":
             response = random.choice(myArr)
-            myArr.remove(int(response))
+            #myArr.remove(int(response))
 
         elif action == "getBoard":
             player_id = params.get("clientId")
