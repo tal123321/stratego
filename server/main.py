@@ -4,64 +4,58 @@ import random
 from Board import Board
 
 PORT = 8000
-ImageLocation = ""
 
 myArr = [1, 2]
 whoseTurn = 1
 
-firstBoard = Board()
-secondBoard = Board()
+board = Board(1,2)
 
-
+playersWaiting = []
+startGame = False
+counterPlayers = 1
 class MyHandler(http.server.BaseHTTPRequestHandler):
     def do_GET(self):
-        global ImageLocation, whoseTurn
+        global whoseTurn,myArr,board,playersWaiting,counterPlayers,startGame
         response = ""
         params = self.parse_QS()  # Parse query parameters
         action = params.get("action")
         value = params.get("value")
+        player_id = params.get("clientId")
+
         if action == "playTurn":
-            print(value)
-            piece = firstBoard.getPiece(int(value[0]), int(value[1]))
+            row1, col1, row2, col2 = map(int, value)
 
-            player_id = params.get("clientId")
-            if action == "playTurn":
-                player_id = params.get("clientId")
-                row1, col1, row2, col2 = map(int, value)
+            # Update the destination board with the piece
+            if str(player_id) == str(board.playerDown):
+                board.movePiece(row1,col1,row2,col2)
+            else:
+                board.movePiece(9-row1, col1,9-row2, col2)
 
-                # Get the piece from the source board
-                if player_id == str(1):
-                    piece = firstBoard.getPiece(row1, col1)
-                else:
-                    piece = secondBoard.getPiece(row1, col1)
+            # Switch player turn
+            if whoseTurn == board.getTopPlayer():
+                whoseTurn = board.getbuttomPlayer()
+            else:
+                whoseTurn = board.getTopPlayer()
 
-                # Update the destination board with the piece
-                if player_id == str(1):
-                    firstBoard.changeBoard(row1, col1, "green")
-                    firstBoard.changeBoard(row2, col2, piece)
-                    secondBoard.changeBoard(9 - row1, col1, "green")
-                    secondBoard.changeBoard(9 - row2, col2, "enemy")
-                else:
-                    secondBoard.changeBoard(row1, col1, "green")
-                    secondBoard.changeBoard(row2, col2, piece)
-                    firstBoard.changeBoard(9 - row1, col1, "green")
-                    firstBoard.changeBoard(9 - row2, col2, "enemy")
+        elif action == "lookingForGame":
+            if player_id not in playersWaiting:
+                playersWaiting.append(player_id)
+            if len(playersWaiting) >= 2 or startGame:
+                if not startGame:
+                    board = Board(player_id, playersWaiting[0])
 
-                # Switch player turn
-                whoseTurn = 3 - int(player_id)
+                countPlayersWaiting = []
+                startGame = True
+                response = "True"
         elif action == "getPlayerId":
-            response = random.choice(myArr)
-            #myArr.remove(int(response))
-
+            response = counterPlayers
+            counterPlayers+= 1
         elif action == "getBoard":
-            player_id = params.get("clientId")
-            if str(player_id) == "1":
-                response = firstBoard.get_board_as_string()
-            elif str(player_id) == "2":
-                response = secondBoard.get_board_as_string()
+            print("player_id" + player_id)
+            response = board.get_board_as_string(player_id)
+            print(response)
 
         elif action == "isMyTurn":
-            player_id = params.get("clientId")
             if str(player_id) == str(whoseTurn):
                 response = "True"
             else:
