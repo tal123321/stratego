@@ -75,7 +75,6 @@ class Board:
 
     def get_board_as_string(self,player):
         #if the player is the player and the top the board should be reversed
-        print("in get_board_as_string player " + player)
         reversedOrNormalBoard = self.board
         if str(player) == str(self.playerUp):
             reversedOrNormalBoard = self.board[::-1]
@@ -119,7 +118,6 @@ class Board:
         return "green"
 
     def switchCards(self,fromRow,fromCol,toRow,toCol):
-        tempRow = fromRow
-        tempCol = fromCol
-        self.board[fromRow][fromCol].copy(self.board[toRow][toCol])
-        self.board[toRow][toCol].copy(self.board[tempRow][tempCol])
+        tempCard = card(self.board[toRow][toCol].getKind(),self.board[toRow][toCol].getPlayer())
+        self.board[toRow][toCol].copy(self.board[fromRow][fromCol])
+        self.board[fromRow][fromCol].copy(tempCard)
