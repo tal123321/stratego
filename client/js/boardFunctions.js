@@ -64,7 +64,7 @@ function moveImage(tdId,gameStarted) {
 		}
 		
 		//if game has started
-        if (counter % 2 == 1&&!td.className.includes('image')) {
+        if (counter % 2 == 1&&!td.className.includes("image")) {
             
             // Check if the location of the new image is legal
             if (!checkIfLocationOk(lastTdId, tdId))
@@ -75,7 +75,7 @@ function moveImage(tdId,gameStarted) {
             callServer("playTurn", lastTdId.toString() + tdId.toString(), function(response) {
                 updateBoard()
             });
-        } else if (counter % 2 == 0 && td.className.includes('image')) {
+        } else if (counter % 2 == 0 &&td.className.includes("image")) {
             lastTdId = tdId;
             counter++;
         }

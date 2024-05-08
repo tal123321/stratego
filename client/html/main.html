@@ -1,5 +1,30 @@
 <!DOCTYPE html>
 <html lang="en">
+<div id = "form">
+  <div class="imgcontainer">
+    <img src="../images/avatar.png" alt="Avatar" class="avatar">
+  </div>
+
+  <div class="container">
+    <label for="uname"><b>Username</b></label>
+    <input type="text" placeholder="Enter Username" name="uname" required>
+
+    <label for="psw"><b>Password</b></label>
+    <input type="password" placeholder="Enter Password" name="psw" required>
+	
+    <input type="button" onclick="location.href='signUp.html';" value="don't have an account?" />
+	
+    <button onclick = "sendUserInfo()">Login</button>
+    <label>
+      <input type="checkbox" checked="checked" name="remember"> Remember me
+    </label>
+  </div>
+
+  <div class="container" style="background-color:#f1f1f1">
+    <button type="button" class="cancelbtn">Cancel</button>
+    <span class="psw">Forgot <a href="#">password?</a></span>
+  </div>
+</div>
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -11,7 +36,16 @@
 </head>
 <body>
 <script>
-	 main();
+	function sendUserInfo(){
+		var username = document.querySelector('input[name="uname"]').value;
+		var password = document.querySelector('input[name="psw"]').value;
+		callServer("signIn",username+ " "+password, function(response) {
+			alert(username+ password);
+			var elementToRemove = document.getElementById("form");
+			elementToRemove.remove();
+			main();
+		});	
+	}
 </script>
 </body>
 </html>

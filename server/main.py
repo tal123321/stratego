@@ -24,6 +24,9 @@ class MyHandler(http.server.BaseHTTPRequestHandler):
         if action == "playTurn":
             games[gameId].playTurn(value)
 
+        if action == "signIn":
+            response = "welcome" + value
+
         elif action == "lookingForGame":
             if player_id in playersWaiting and startGame:
                 response = randomId
@@ -34,7 +37,7 @@ class MyHandler(http.server.BaseHTTPRequestHandler):
 
             elif player_id not in playersWaiting:
                 playersWaiting.append(player_id)
-            elif len(playersWaiting) >= 2 and not startGame:
+            if len(playersWaiting) >= 2 and not startGame:
                 randomId = self.RandomId()
                 games[randomId] = game(player_id,playersWaiting[0],True)
                 response = randomId

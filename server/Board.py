@@ -55,7 +55,7 @@ class Board:
             placeTo.copy(placeFrom)
             placeFrom.copy(card("green"))
             return
-        #there is a war between two cards
+        #there is a fight between two cards
         if placeTo.getKind() == "bomb":
             #incase of a bomb only card 3 survives
             if placeFrom.getKind() == "image3":
@@ -64,11 +64,10 @@ class Board:
                 placeTo.copy(card("green"))
             placeFrom.copy(card("green"))
             return
-
-        #if there is an enemy card
-        if placeFrom.getKind()[-1] > placeTo.getKind()[-1]:
+        #if there is an enemy card or a one attacking a nine
+        if (placeFrom.getKind()[-1] > placeTo.getKind()[-1]) or (placeFrom.getKind()[-1] == "1" and placeTo.getKind()[-1] == "9"):
             placeTo.copy(placeFrom)
-        elif self.board[toRow][toCol].getKind()[-1] == self.board[toRow][toCol].getKind()[-1]:
+        elif placeFrom.getKind()[-1] == placeTo.getKind()[-1]:
             placeTo.copy(card("green"))
         placeFrom.copy(card("green"))
 
