@@ -1,36 +1,57 @@
 from Board import Board
+import threading
+import time
+
+
 class game():
-    def __init__(self, playerDown,playerUp,gameStatus):
+    def __init__(self, playerDown, playerUp):
         self.playerDown = playerDown
         self.playerUp = playerUp
-        self.gameStatus = gameStatus
-        self.board = Board(playerUp,playerDown)
+        self.board = Board(playerUp, playerDown)
         self.turn = playerDown
+        self.chat = ""
+        self.status = "not started"
 
-    def getBoardAsString(self,player):
-        return self.board.get_board_as_string(player)
+        self.timeThread = ThreadClass(10)
+        self.timeThread.start()
+
+    def getBoardAsString(self, player):
+        # if status is not going someone won
+        if self.status not in ["going", "not started"]:
+            return self.status
+        return self.board.getBoardAsString(player)
 
     def getPlayerDown(self):
         return self.playerDown
+
     def getPlayerUp(self):
         return self.playerUp
 
-    def setPlayerDown(self,playerDown):
+    def deletePlayer(self, player):
+        if player == self.playerDown:
+            self.playerDown = ""
+        elif player == self.playerUp:
+            self.playerUp = ""
+        return self.playerUp == "" and self.playerDown == ""
+
+    def setPlayerDown(self, playerDown):
         self.playerDown = playerDown
-    def SetPlayerUp(self,playerUp):
+
+    def SetPlayerUp(self, playerUp):
         self.playerUp = playerUp
 
-    def GetStatus(self):
-        return self.gameStatus
-
-    def playTurn(self,value):
+    def playTurn(self, value):
         row1, col1, row2, col2 = map(int, value)
 
         # Update the destination board with the piece
         if str(self.turn) == str(self.board.playerDown):
-            self.board.movePiece(row1, col1, row2, col2)
+            if self.board.movePiece(row1, col1, row2, col2):
+                # if true game is over winner is the one who played right now
+                self.status = self.turn
         else:
-            self.board.movePiece(9 - row1, col1, 9 - row2, col2)
+            if self.board.movePiece(9 - row1, col1, 9 - row2, col2):
+                # if true game is over winner is the one who played right now
+                self.status = self.turn
 
         # Switch player turn
         if self.turn == self.playerDown:
@@ -38,8 +59,10 @@ class game():
         else:
             self.turn = self.playerDown
 
+    def getTime(self):
+        return self.timeThread.getTime()
 
-    def switchCards(self,value,player):
+    def switchCards(self, value, player):
         row1, col1, row2, col2 = map(int, value)
 
         # Update the destination board with the piece
@@ -47,3 +70,26 @@ class game():
             self.board.switchCards(row1, col1, row2, col2)
         else:
             self.board.switchCards(9 - row1, col1, 9 - row2, col2)
+
+    def sendText(self, player, value):
+        self.chat += player + ": " + value + "<br>"
+        print(self.chat)
+
+    def getText(self):
+        return self.chat
+
+
+class ThreadClass(threading.Thread):
+    def __init__(self, seconds):
+        threading.Thread.__init__(self)
+        self.time = seconds
+
+    def run(self):
+        while self.time > 0:
+            time.sleep(1)
+            self.time -= 1
+
+    def getTime(self):
+        minutes = self.time // 60
+        remaining_seconds = self.time % 60
+        return f"{minutes}:{remaining_seconds:02d}"

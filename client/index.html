@@ -1,0 +1,184 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+
+        <meta name="description" content="">
+        <meta name="author" content="">
+
+        <title>Stratego online game by Tal Divon</title>
+
+        <!-- CSS FILES -->
+
+     
+
+
+
+
+        <link href="css/bootstrap.min.css" rel="stylesheet">
+
+        <link href="css/bootstrap-icons.css" rel="stylesheet">
+
+        <link href="css/owl.carousel.min.css" rel="stylesheet">
+
+        <link href="css/owl.theme.default.min.css" rel="stylesheet">
+
+        <link href="css/tooplate-gotto-job.css" rel="stylesheet">
+        
+		
+        <script src="js/jquery.min.js"></script>
+        <script src="js/owl.carousel.min.js"></script>
+        <script src="js/counter.js"></script>
+        <script src="js/custom.js"></script>
+
+		
+		  <link rel="stylesheet" href="css/main.css" /> 
+		  <script src="js/jquery-3.7.1.min.js"></script>
+		  <script src="js/game.js"></script>
+		  <script src="js/boardFunctions.js"></script>
+		  <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
+
+
+		<script>
+			let userName;
+			function login(){
+				userName = document.querySelector('input[name="uname"]').value;
+				var password = document.querySelector('input[name="psw"]').value;
+				callServer("login",userName+" "+hashPassword(password), function(response) {
+					if (response == "True"){
+						var elementToRemove = document.getElementById("form");
+						elementToRemove.remove();
+						main();
+					}else{
+						alert("user name or password is incorrect");
+					}
+				});	
+			}
+	
+			function signUp(){
+				var userName = document.querySelector('input[name="uname"]').value;
+				var password = document.querySelector('input[name="psw"]').value;
+				callServer("signUp",userName+" "+ hashPassword(password), function(response) {
+					if (response == "True"){
+						alert("joined successfully")
+					}else{
+						alert("username already exist");
+					}
+				});	
+			}
+	
+		function hashPassword(password) {
+			return CryptoJS.SHA256(password).toString();
+		}
+		
+			function validateName(password) {
+				let isPasswordOk = "ok";
+				if (name.includes(' ')) {
+					isPasswordOk = "should not consist spaces";
+				}
+				if (name.length <= 3) {
+					isPasswordOk = "should be higher than 3";
+				}
+				if (name.length >= 16) {
+					isPasswordOk = "should be lower than 16";
+				}
+				return isPasswordOk;
+			}
+		</script>
+
+    </head>
+    
+    <body id="top">
+
+        <nav class="navbar navbar-expand-lg">
+            <div class="container">
+                <a class="navbar-brand d-flex align-items-center" href="index.html">
+                    <img src="images/logo.jpg" class="logo">
+                </a>
+
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+
+                <div class="collapse navbar-collapse" id="navbarNav">
+                    <ul class="navbar-nav align-items-center ms-lg-5">
+
+                        <li class="nav-item ms-lg-auto">
+                            <a class="nav-link" href="register.html">Register</a>
+                        </li>
+
+                        <li class="nav-item">
+                            <a class="nav-link custom-btn btn" href="#">Login</a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </nav>
+
+        <main>
+
+            <section class="hero-section d-flex justify-content-center align-items-center">
+                <div class="section-overlay"></div>
+
+                <div class="container" id="container" name="container">
+                    <div class="row" id="left_div" name="left_div">
+
+                        <div class="col-lg-6 col-12 mb-5 mb-lg-0">
+                            <div class="hero-section-text mt-5">
+                                <h6 class="text-white">Startego Battle</h6>
+                                <h1 class="hero-title text-white mt-4 mb-4">Stratego. <br> Best online game ever</h1>
+
+                                <a href="instructions.html" class="custom-btn custom-border-btn btn">Click for Game instructions</a>
+                            </div>
+                        </div>
+
+                        <div class="col-lg-6 col-12" id="form" name="form">
+                            <div class="custom-form hero-form" action="#" method="get" role="form">
+                                <h3 class="text-white mb-3">Login to start the game</h3>
+
+                                <div class="row">
+                                    <div class="col-lg-6 col-md-6 col-12">
+                                        <div class="input-group">
+                                            <span class="input-group-text" id="basic-addon1"><i class="bi-person custom-icon"></i></span>
+
+                                            <input type="text" name="uname" id="uname" class="form-control" placeholder="Username" required>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-lg-6 col-md-6 col-12">
+                                        <div class="input-group">
+                                            <span class="input-group-text" id="basic-addon2"><i class="bi-geo-alt custom-icon"></i></span>
+
+                                            <input type="text" name="psw" id="psw" class="form-control" placeholder="Password" required>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-lg-12 col-12">
+										<button class="form-control" onclick = "login()">
+                                            Login
+                                        </button>
+                                    </div>
+									<div class="col-lg-12 col-12">
+										<button class="form-control" onclick = "signUp()">
+                                            signUp
+                                        </button>
+                                    </div>
+                                    
+                                </div>
+                            </div>
+                        </div>
+						
+						<div id = "contain_board">
+						</div>
+
+                    </div>
+                </div>
+            </section>
+          
+        </main>
+
+
+
+    </body>
+</html>

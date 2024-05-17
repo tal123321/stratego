@@ -20,6 +20,10 @@
 		background-repeat: no-repeat;
 		background-size: 75% 75%;
 	}
+	.logo {
+		width: 332px;
+		height: 126px;
+	}
 	.image1 {
         background-image: url('../images/image1.jpg');
     }

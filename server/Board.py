@@ -50,29 +50,31 @@ class Board:
     def movePiece(self,fromRow,fromCol,toRow,toCol):
         placeFrom = self.board[fromRow][fromCol]
         placeTo = self.board[toRow][toCol]
-
-        if placeTo.getKind() == "green":
+        if placeTo.getKind() == "flag":
+            #game is over
+            return True
+        elif placeTo.getKind() == "green":
             placeTo.copy(placeFrom)
             placeFrom.copy(card("green"))
-            return
         #there is a fight between two cards
-        if placeTo.getKind() == "bomb":
+        elif placeTo.getKind() == "bomb":
             #incase of a bomb only card 3 survives
             if placeFrom.getKind() == "image3":
                 placeTo.copy(placeFrom)
             else:
                 placeTo.copy(card("green"))
             placeFrom.copy(card("green"))
-            return
         #if there is an enemy card or a one attacking a nine
-        if (placeFrom.getKind()[-1] > placeTo.getKind()[-1]) or (placeFrom.getKind()[-1] == "1" and placeTo.getKind()[-1] == "9"):
+        elif (placeFrom.getKind()[-1] > placeTo.getKind()[-1]) or (placeFrom.getKind()[-1] == "1" and placeTo.getKind()[-1] == "9"):
             placeTo.copy(placeFrom)
         elif placeFrom.getKind()[-1] == placeTo.getKind()[-1]:
             placeTo.copy(card("green"))
         placeFrom.copy(card("green"))
+        #game is not over
+        return False
 
 
-    def get_board_as_string(self,player):
+    def getBoardAsString(self,player):
         #if the player is the player and the top the board should be reversed
         reversedOrNormalBoard = self.board
         if str(player) == str(self.playerUp):
