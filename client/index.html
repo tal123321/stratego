@@ -56,18 +56,6 @@
 				});	
 			}
 	
-			function signUp(){
-				var userName = document.querySelector('input[name="uname"]').value;
-				var password = document.querySelector('input[name="psw"]').value;
-				callServer("signUp",userName+" "+ hashPassword(password), function(response) {
-					if (response == "True"){
-						alert("joined successfully")
-					}else{
-						alert("username already exist");
-					}
-				});	
-			}
-	
 		function hashPassword(password) {
 			return CryptoJS.SHA256(password).toString();
 		}
@@ -159,18 +147,10 @@
                                             Login
                                         </button>
                                     </div>
-									<div class="col-lg-12 col-12">
-										<button class="form-control" onclick = "signUp()">
-                                            signUp
-                                        </button>
-                                    </div>
                                     
                                 </div>
                             </div>
                         </div>
-						
-						<div id = "contain_board">
-						</div>
 
                     </div>
                 </div>

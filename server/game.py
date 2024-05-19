@@ -42,14 +42,17 @@ class game():
 
     def playTurn(self, value):
         row1, col1, row2, col2 = map(int, value)
-
         # Update the destination board with the piece
         if str(self.turn) == str(self.board.playerDown):
-            if self.board.movePiece(row1, col1, row2, col2):
+            if self.turn != self.board.getCardOwner(row1, col1):
+                return
+            if self.board.movePiece(row1, col1, row2, col2,self.turn):
                 # if true game is over winner is the one who played right now
                 self.status = self.turn
         else:
-            if self.board.movePiece(9 - row1, col1, 9 - row2, col2):
+            if self.turn != self.board.getCardOwner(9-row1, col1):
+                return
+            if self.board.movePiece(9 - row1, col1, 9 - row2, col2,self.turn):
                 # if true game is over winner is the one who played right now
                 self.status = self.turn
 

@@ -42,23 +42,14 @@
 
 		<script>
 			let userName;
-			function login(){
-				userName = document.querySelector('input[name="uname"]').value;
-				var password = document.querySelector('input[name="psw"]').value;
-				callServer("login",userName+" "+hashPassword(password), function(response) {
-					if (response == "True"){
-						var elementToRemove = document.getElementById("form");
-						elementToRemove.remove();
-						main();
-					}else{
-						alert("user name or password is incorrect");
-					}
-				});	
-			}
-	
 			function signUp(){
-				var userName = document.querySelector('input[name="uname"]').value;
-				var password = document.querySelector('input[name="psw"]').value;
+				var userName = document.getElementById('uname').value;
+				var password = document.getElementById('psw').value;
+				var password2 = document.getElementById('repeatPsw').value;
+				if (password!= password2){
+					alert("Passwords do not match.")
+					return;
+				}
 				callServer("signUp",userName+" "+ hashPassword(password), function(response) {
 					if (response == "True"){
 						alert("joined successfully")
@@ -109,7 +100,7 @@
                         </li>
 
                         <li class="nav-item">
-                            <a class="nav-link custom-btn btn" href="#">Login</a>
+                            <a class="nav-link custom-btn btn" href="index.html">Login</a>
                         </li>
                     </ul>
                 </div>
@@ -138,34 +129,30 @@
                                 <h3 class="text-white mb-3">Login to start the game</h3>
 
                                 <div class="row">
-                                    <div class="col-lg-6 col-md-6 col-12">
-                                        <div class="input-group">
-                                            <span class="input-group-text" id="basic-addon1"><i class="bi-person custom-icon"></i></span>
-
-                                            <input type="text" name="uname" id="uname" class="form-control" placeholder="Username" required>
-                                        </div>
-                                    </div>
-
-                                    <div class="col-lg-6 col-md-6 col-12">
-                                        <div class="input-group">
-                                            <span class="input-group-text" id="basic-addon2"><i class="bi-geo-alt custom-icon"></i></span>
-
-                                            <input type="text" name="psw" id="psw" class="form-control" placeholder="Password" required>
-                                        </div>
-                                    </div>
-
-                                    <div class="col-lg-12 col-12">
-										<button class="form-control" onclick = "login()">
-                                            Login
-                                        </button>
-                                    </div>
-									<div class="col-lg-12 col-12">
-										<button class="form-control" onclick = "signUp()">
-                                            signUp
-                                        </button>
-                                    </div>
-                                    
-                                </div>
+									<div class="col-12">
+										<div class="input-group">
+											<span class="input-group-text" id="basic-addon1"><i class="bi-person custom-icon"></i></span>
+											<input type="text" name="uname" id="uname" class="form-control" placeholder="Username" required>
+										</div>
+									</div>
+									<div class="col-md-6 col-12">
+										<div class="input-group">
+											<span class="input-group-text" id="basic-addon2"><i class="bi-geo-alt custom-icon"></i></span>
+											<input type="text" name="psw" id="psw" class="form-control" placeholder="Password" required>
+										</div>
+									</div>
+									<div class="col-md-6 col-12">
+										<div class="input-group">
+											<span class="input-group-text" id="basic-addon3"><i class="bi-geo-alt custom-icon"></i></span>
+											<input type="text" name="repeatPsw" id="repeatPsw" class="form-control" placeholder="Repeat Password" required>
+										</div>
+									</div>
+									<div class="col-12">
+										<button class="form-control" onclick="signUp()">
+											Sign Up
+										</button>
+									</div>
+								</div>
                             </div>
                         </div>
 						

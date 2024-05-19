@@ -1,5 +1,4 @@
-    let playerTurn = 0; 
-    var refreshIntervalId;
+	var refreshIntervalId;
 	var gameStarted = false;
 	var gameId = "";
     function main() {

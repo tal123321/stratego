@@ -5,6 +5,7 @@ from Board import Board
 from game import game
 import string
 import sqlite3
+import json
 
 PORT = 8000
 
@@ -23,8 +24,6 @@ class MyHandler(http.server.BaseHTTPRequestHandler):
         value = params.get("value")
         player_id = params.get("clientId")
         gameId = params.get("game_Id")
-        if action == "getTime":
-            response = games[gameId].getTime()
 
         if action == "login":
             # check if the user exist
@@ -37,8 +36,6 @@ class MyHandler(http.server.BaseHTTPRequestHandler):
             response = self.sign_up(value.split()[0], value.split()[1])
         elif action == "sendText":
             games[gameId].sendText(player_id, value)
-        elif action == "getText":
-            response = games[gameId].getText()
 
         elif action == "playTurn":
             games[gameId].playTurn(value)
@@ -59,13 +56,16 @@ class MyHandler(http.server.BaseHTTPRequestHandler):
                 response = randomId
                 startGame = True
 
-        elif action == "getBoard":
-            response = games[gameId].getBoardAsString(player_id)
-            if " " not in response and games[gameId].deletePlayer(player_id):
+        elif action == "getGame":
+            response = {}  # board,chat,time
+            response["board"] = games[gameId].getBoardAsString(player_id)
+            response["chat"] = games[gameId].getText()
+            response["time"] = games[gameId].getTime()
+            if isinstance(response, list) and games[gameId].deletePlayer(player_id):
                 # if reached here it means both player got the message and we can erase the game
                 games.pop(gameId, None)
-                print(response)
-
+            else:
+                response = json.dumps(response)
 
         elif action == "isMyTurn":
             response = str(games[gameId].turn == player_id)
