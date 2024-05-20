@@ -45,6 +45,15 @@
 			function login(){
 				userName = document.querySelector('input[name="uname"]').value;
 				var password = document.querySelector('input[name="psw"]').value;
+				
+				if (validateName(userName)!= "ok"){
+					alert("username " + validateName(userName));
+					return;
+				}else if (validateName(password)!= "ok"){
+					alert("password "+validateName(password));
+					return;
+				}
+				
 				callServer("login",userName+" "+hashPassword(password), function(response) {
 					if (response == "True"){
 						var elementToRemove = document.getElementById("form");
@@ -60,7 +69,7 @@
 			return CryptoJS.SHA256(password).toString();
 		}
 		
-			function validateName(password) {
+			function validateName(name) {
 				let isPasswordOk = "ok";
 				if (name.includes(' ')) {
 					isPasswordOk = "should not consist spaces";
@@ -77,10 +86,10 @@
 
     </head>
     
-    <body id="top">
+    <body>
 
         <nav class="navbar navbar-expand-lg">
-            <div class="container">
+            <div class="container" id = "top">
                 <a class="navbar-brand d-flex align-items-center" href="index.html">
                     <img src="images/logo.jpg" class="logo">
                 </a>
@@ -112,7 +121,7 @@
                 <div class="container" id="container" name="container">
                     <div class="row" id="left_div" name="left_div">
 
-                        <div class="col-lg-6 col-12 mb-5 mb-lg-0">
+                        <div class="col-lg-6 col-12 mb-5 mb-lg-0" id = "instructions">
                             <div class="hero-section-text mt-5">
                                 <h6 class="text-white">Startego Battle</h6>
                                 <h1 class="hero-title text-white mt-4 mb-4">Stratego. <br> Best online game ever</h1>

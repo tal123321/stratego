@@ -59,6 +59,10 @@ function checkStartGame() {
 				//stop calling checkStartGame
                 clearInterval(refreshIntervalId);
 				
+				//remove the top
+				document.getElementById('top').remove();
+				document.getElementById('instructions').remove();
+				
 				// create Board
 				createGame(10, 10);
 				updateBoard();

@@ -49,6 +49,12 @@
 				if (password!= password2){
 					alert("Passwords do not match.")
 					return;
+				}else if (validateName(userName)!= "ok"){
+					alert("username " + validateName(userName));
+					return;
+				}else if (validateName(password)!= "ok"){
+					alert("password "+validateName(password));
+					return;
 				}
 				callServer("signUp",userName+" "+ hashPassword(password), function(response) {
 					if (response == "True"){
@@ -63,7 +69,7 @@
 			return CryptoJS.SHA256(password).toString();
 		}
 		
-			function validateName(password) {
+			function validateName(name) {
 				let isPasswordOk = "ok";
 				if (name.includes(' ')) {
 					isPasswordOk = "should not consist spaces";
