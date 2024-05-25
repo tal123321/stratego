@@ -6,7 +6,7 @@
         const button = document.createElement('button');
         button.innerText = 'Start Game';
 		button.id = "idToRemove";
-        document.body.appendChild(button);
+        document.getElementById('left_div').appendChild(button);
         button.addEventListener('click', () => {  
 			document.getElementById('idToRemove').remove();
             refreshIntervalId = setInterval(function() {
@@ -60,7 +60,6 @@ function checkStartGame() {
                 clearInterval(refreshIntervalId);
 				
 				//remove the top
-				document.getElementById('top').remove();
 				document.getElementById('instructions').remove();
 				
 				// create Board
