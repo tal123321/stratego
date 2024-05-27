@@ -12,10 +12,10 @@ class game():
         self.chat = ""
         self.status = "not started"
 
-        self.timeThread = ThreadClass(10)
+        self.timeThread = showTimeThread(10)
         self.timeThread.start()
 
-    def getBoardAsString(self, player):
+    def getBoardAsArray(self, player):
         # if status is not going someone won
         if self.status not in ["going", "not started"]:
             return self.status
@@ -46,14 +46,14 @@ class game():
         if str(self.turn) == str(self.board.playerDown):
             if self.turn != self.board.getCardOwner(row1, col1):
                 return
-            if self.board.movePiece(row1, col1, row2, col2,self.turn):
-                # if true game is over winner is the one who played right now
+            if self.board.movePiece(row1, col1, row2, col2, self.turn):
+                # if game is over winner is the one who played right now
                 self.status = self.turn
         else:
-            if self.turn != self.board.getCardOwner(9-row1, col1):
+            if self.turn != self.board.getCardOwner(9 - row1, col1):
                 return
-            if self.board.movePiece(9 - row1, col1, 9 - row2, col2,self.turn):
-                # if true game is over winner is the one who played right now
+            if self.board.movePiece(9 - row1, col1, 9 - row2, col2, self.turn):
+                # if game is over winner is the one who played right now
                 self.status = self.turn
 
         # Switch player turn
@@ -76,13 +76,12 @@ class game():
 
     def sendText(self, player, value):
         self.chat += player + ": " + value + "<br>"
-        print(self.chat)
 
     def getText(self):
         return self.chat
 
 
-class ThreadClass(threading.Thread):
+class showTimeThread(threading.Thread):
     def __init__(self, seconds):
         threading.Thread.__init__(self)
         self.time = seconds

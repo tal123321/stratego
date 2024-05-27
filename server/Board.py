@@ -21,15 +21,16 @@ class card:
     def getKind(self):
         return self.kind
 
-    def changeKind(self, kind):
+    def setKind(self, kind):
         self.kind = kind
 
-    def changePlayer(self, player):
+    def setPlayer(self, player):
         self.player = player
 
     def copy(self, other):
         self.kind = other.kind
         self.player = other.player
+        self.show = show
 
     def shouldShow(self, player):
         return str(self.player) == str(player) or str(self.getPlayer()) == "0" or self.show
@@ -43,7 +44,7 @@ class Board:
         for row in range(rows):
             current_row = []
             for col in range(columns):
-                cell_content = self.determine_cell_content(row + 1, col + 1)
+                cell_content = self.determineCellContent(row + 1, col + 1)
                 if row < 4:
                     current_row.append(card(cell_content, playerUp))
                 elif row > 5:
@@ -64,7 +65,7 @@ class Board:
     def getPiece(self, row, col):
         return self.board[int(row)][int(col)].getKind()
 
-    def movePiece(self, fromRow, fromCol, toRow, toCol,player):
+    def movePiece(self, fromRow, fromCol, toRow, toCol):
         placeFrom = self.board[fromRow][fromCol]
         placeTo = self.board[toRow][toCol]
 
@@ -91,11 +92,11 @@ class Board:
             placeTo.copy(card("green"))
         self.board[fromRow][fromCol] = card("green")
         # game is not over
-        showCard = ThreadClass(self.board[toRow][toCol])
+        showCard = showCardThread(self.board[toRow][toCol])
         showCard.start()
         return False
 
-    def getBoardAsString(self, player):
+    def getBoardAsArray(self, player):
         # if the player is the player and the top the board should be reversed
         reversedOrNormalBoard = self.board
         if str(player) == str(self.playerUp):
@@ -112,7 +113,7 @@ class Board:
         return boardToSend
 
     @staticmethod
-    def determine_cell_content(row, col):
+    def determineCellContent(row, col):
         if (row == 7 and col == 1) or (row == 4 and col == 1):
             return "image1"
         elif (row == 7 and col < 10) or (row == 4 and col < 10):
@@ -148,7 +149,7 @@ class Board:
         return self.board[row][col].getPlayer()
 
 
-class ThreadClass(threading.Thread):
+class showCardThread(threading.Thread):
     def __init__(self, card):
         threading.Thread.__init__(self)
         self.card = card
@@ -156,5 +157,6 @@ class ThreadClass(threading.Thread):
     def run(self):
         # make the card visible to both players so both player will now what card was that.
         player = self.card.setShow(True)
-        time.sleep(5)
+        time.sleep(3)
         player = self.card.setShow(False)
+
