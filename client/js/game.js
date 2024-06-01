@@ -1,6 +1,16 @@
 	var refreshIntervalId;
 	var gameStarted = false;
 	var gameId = "";
+	var serverIp = "10.0.0.8";
+	
+	function sendText() {
+		var textToAdd = document.getElementById("input-text").value;
+		if (textToAdd.trim() !== "") {
+			callServer("sendText", textToAdd, function(response) {
+				document.getElementById("input-text").value = ""; // Clear the input field after adding text
+			});
+		}
+	}
     function main() {
         // Create a button to start the game
         const button = document.createElement('button');
@@ -14,12 +24,24 @@
             }, 1000);
         });
     }
+function encryptMsg(message) {
+    // still not written
+    return message;
+}
 
-	function callServer(actionToDo, valueToPass, callback) {
-		$.get("http://127.0.0.1:8000", { action: actionToDo,game_Id:gameId, value: valueToPass, clientId: userName
-		}, function (msg_from_server) {
-			callback(msg_from_server);
-		});
+function callServer(actionToDo, valueToPass, callback) {
+    // encrypt message
+    let encryptedValue = encryptMsg(valueToPass);
+
+    // send encrypt message
+    $.get("http://127.0.0.1:8000", {
+        action: actionToDo,
+        game_Id: gameId,
+        value: encryptedValue,
+        clientId: userName
+    }, function (msg_from_server) {
+        callback(msg_from_server);
+    });
 }
 
 function playTurn(lastTdId,tdId) {

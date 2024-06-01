@@ -19,7 +19,7 @@ class game():
         # if status is not going someone won
         if self.status not in ["going", "not started"]:
             return self.status
-        return self.board.getBoardAsString(player)
+        return self.board.getBoardAsArray(player)
 
     def getPlayerDown(self):
         return self.playerDown

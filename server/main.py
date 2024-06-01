@@ -58,7 +58,7 @@ class MyHandler(http.server.BaseHTTPRequestHandler):
 
         elif action == "getGame":
             response = {}  # board,chat,time
-            response["board"] = games[gameId].getBoardAsString(player_id)
+            response["board"] = games[gameId].getBoardAsArray(player_id)
             response["chat"] = games[gameId].getText()
             response["time"] = games[gameId].getTime()
             if isinstance(response, list) and games[gameId].deletePlayer(player_id):
