@@ -14,15 +14,58 @@
     // Create the table using the createTable function
     let table = createTable(rows, cols);
 
-    // Create the clock div
-    var clockDiv = document.createElement("div");
-    clockDiv.id = "clock";
-    clockDiv.setAttribute("style", "font-size: 24px; margin-bottom: 10px;");
+    // Create the clock divs
+	var Player1clock = document.createElement("div");
+	Player1clock.id = "clock1";
+	Player1clock.setAttribute("style", "font-size: 24px; margin-bottom: 10px;");
 
-    // Append the table and clock div to the table-clock section
-    tableClockSection.appendChild(clockDiv);
-    tableClockSection.appendChild(table);
+	var Player2clock = document.createElement("div");
+	Player2clock.id = "clock2";
+	Player2clock.setAttribute("style", "font-size: 24px; margin-bottom: 10px;");
 
+	// Create two <div> elements to display the ratings and clocks
+	let p1 = document.createElement('div');
+	p1.setAttribute("style", "display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;");
+
+	let p2 = document.createElement('div');
+	p2.setAttribute("style", "display: flex; justify-content: space-between; align-items: center;");
+
+	// Create spans to hold the ratings
+	let rating1 = document.createElement('span');
+	let rating2 = document.createElement('span');
+
+	// Get the names and the rating
+	callServer("getRating", "", function(response) {
+		response = response.split(' ');
+		rating1.textContent = response[0];
+		rating2.textContent = response[1];
+	});
+
+	// Append the ratings and clocks to the <div> elements
+	p1.appendChild(rating1);
+	p1.appendChild(Player1clock);
+
+	p2.appendChild(rating2);
+	p2.appendChild(Player2clock);
+
+	// Append the <div> elements and table to the table-clock section
+	tableClockSection.appendChild(p1);
+	tableClockSection.appendChild(table);
+	tableClockSection.appendChild(p2);
+	
+	//create button to startGame
+    var startGameBottom = document.createElement("button");
+	startGameBottom.id = "startGame";
+    startGameBottom.textContent = "ready to start Game?";
+    startGameBottom.addEventListener("click", readyStartGame);
+	tableClockSection.appendChild(startGameBottom);
+	
+	//create button resign
+    var resignBottom = document.createElement("button");
+    resignBottom.textContent = "resign";
+    resignBottom.addEventListener("click", resign);
+	tableClockSection.appendChild(resignBottom);
+	
     // Create the text section div
     var textSection = document.createElement("div");
     textSection.setAttribute("class", "text-section");
@@ -96,78 +139,6 @@ function createTable(rows, cols) {
     return table;
 }
 
-// check if we want to move the image to a new location which is legal
-function checkIfLocationOk(lastTdId, tdId) {
-    var lastTd = document.getElementById(lastTdId);
-    var td = document.getElementById(tdId);
-    
-    // Calculate the absolute difference between rows and columns
-    var rowDiff = Math.abs(tdId[0] - lastTdId[0]);
-    var colDiff = Math.abs(tdId[1] - lastTdId[1]);
-    
-    // If the difference in rows or columns is more than 1
-    if (rowDiff > 1 || colDiff > 1) {
-        // If the card is not a 2, return false
-        if (!lastTd.className.includes("2")) {
-            return false;
-        } else {
-            // If the card is a 2, it can jump more than one tile
-            // Check if it's a valid jump (only vertical or horizontal)
-            if (rowDiff > 0 && colDiff > 0) {
-                return false; // diagonal jump is not allowed
-            }
-            
-            // Check if there are cards between initial and final positions
-            if (rowDiff === 0) { // Horizontal jump
-                var startCol = Math.min(lastTdId[1], tdId[1]);
-                var endCol = Math.max(lastTdId[1], tdId[1]);
-                for (var col = startCol + 1; col < endCol; col++) {
-                    var card = document.getElementById(lastTdId[0] + col);
-                    if (!card.className.includes("green")) {
-                        return false; // Invalid jump over non-green or non-blue cards
-                    }
-                }
-            } else if (colDiff === 0) { // Vertical jump
-                var startRow = Math.min(lastTdId[0], tdId[0]);
-                var endRow = Math.max(lastTdId[0], tdId[0]);
-                for (var row = startRow + 1; row < endRow; row++) {
-                    var card = document.getElementById(row + lastTdId[1]);
-                    if (!card.className.includes("green")) {
-                        return false; // Invalid jump over non-green or non-blue cards
-                    }
-                }
-            }
-        }
-    }
-	return true;
-}
-
-function moveImage(lastTdId, tdId, gameStarted) {
-    var td = document.getElementById(tdId);
-	var lastTd = document.getElementById(lastTdId);
-
-    // if game is not started 
-    if (!gameStarted&&tdId[0] > 5) {
-		// Send the move to the server
-        callServer("switchCards", lastTdId.toString() + tdId.toString(), function(response) {
-			updateBoard();
-        });
-        return;
-    }
-
-    // if game has started and the cell contains an image
-    if (gameStarted && lastTd.classList[1].includes("image")&&!td.classList[1].includes("image")) {
-        // Check if the location of the new image is legal
-        if (!checkIfLocationOk(lastTdId, tdId))
-            return;
-
-        // Send the move to the server
-        callServer("playTurn", lastTdId.toString() + tdId.toString(), function(response) {
-            updateBoard();
-        });
-    }
-}
-
 function updateBoard(){
 	//update the board
 	callServer("getGame","", function(response) {
@@ -176,7 +147,8 @@ function updateBoard(){
 		response = JSON.parse(response);
 		let board = response["board"];
 		let chat = response["chat"];
-		let time = response["time"];
+		let timeFirstPlayer = response["time1"];
+		let timeSecondPlayer = response["time2"];
 		
 		if (!Array.isArray(board)){
 			// if the first one is not an array it means game is over
@@ -201,21 +173,30 @@ function updateBoard(){
 			document.getElementById("textContainer").innerHTML = chat + "<br />";
 		
 		//update the time
-		document.getElementById("clock").innerHTML = time;
-		if(time == "0:00"){
-			gameStarted = true;
-		}
+		document.getElementById("clock1").innerHTML = timeFirstPlayer;
+		document.getElementById("clock2").innerHTML = timeSecondPlayer;
 	});
+}
+
+function readyStartGame(){
+	callServer("readyStartGame", "", function(response) {
+		document.getElementById("startGame").remove();
+    });
 }
 
 //end the game
 function gameOver(winner){
+	//remove the game from localStorge
+	 localStorage.removeItem(userName);
+	 
 	if (userName == winner)
 		alert("you won");
 	else
 		alert("you lost");
-	document.getElementById("contain_game").remove();
+	// Check if the element with id 'contain_game' exists
+	var gameContainer = document.getElementById("contain_game");
+	if (gameContainer) 
+		gameContainer.remove();
 	clearInterval(updateBoardInterval);
-	gameStarted = false;
 	main();	
 }

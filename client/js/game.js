@@ -1,5 +1,4 @@
 	var refreshIntervalId;
-	var gameStarted = false;
 	var gameId = "";
 	var serverIp = "10.0.0.8";
 	
@@ -24,20 +23,18 @@
             }, 1000);
         });
     }
-function encryptMsg(message) {
-    // still not written
-    return message;
-}
 
-function callServer(actionToDo, valueToPass, callback) {
+async function callServer(actionToDo, valueToPass, callback) {
     // encrypt message
-    let encryptedValue = encryptMsg(valueToPass);
+	let encryptedValue = valueToPass;
+	if (actionToDo !== "sendSemetricKey") 
+		//encryptedValue = await encryptData(valueToPass, semetricKey);
 
     // send encrypt message
     $.get("http://127.0.0.1:8000", {
         action: actionToDo,
         game_Id: gameId,
-        value: encryptedValue,
+        value: valueToPass,
         clientId: userName
     }, function (msg_from_server) {
         callback(msg_from_server);
@@ -45,21 +42,26 @@ function callServer(actionToDo, valueToPass, callback) {
 }
 
 function playTurn(lastTdId,tdId) {
-	//see if game started or its still time to create the board
-	if (!gameStarted){
-		moveImage(lastTdId,tdId,gameStarted);
-	}else {
-		//send the move to the other player
-		callServer("isMyTurn","", function(response) {
-			if (response == "True") {
-				moveImage(lastTdId,tdId,gameStarted);
-			}
-			else{
-				alert("waiting for opponent to play");
-			}
-		});
-	}
+	callServer("playTurn", lastTdId.toString() + tdId.toString(), function(response) {
+		updateBoard();
+		if (response == "enemy Turn")
+			alert("its not your turn")
+    });
 }
+
+function validateName(name) {
+				let isPasswordOk = "ok";
+				if (name.includes(' ')) {
+					isPasswordOk = "should not consist spaces";
+				}
+				if (name.length <= 3) {
+					isPasswordOk = "should be higher than 3";
+				}
+				if (name.length >= 16) {
+					isPasswordOk = "should be lower than 16";
+				}
+				return isPasswordOk;
+			}
 
 function sendText() {
 	var textToAdd = document.getElementById("input-text").value;
@@ -89,8 +91,22 @@ function checkStartGame() {
 				updateBoard();
                 updateBoardInterval = setInterval(updateBoard, 1000);
 				
+				// Store username in localStorage
+				localStorage.setItem(userName, gameId);
             } else {
                 console.log("Waiting for another player...");
             }
         });
     }
+	function resign(){
+		callServer("resign","", function(response) {
+			 // Check if the element with id 'contain_game' exists
+			  var gameContainer = document.getElementById("contain_game");
+			  if (gameContainer) 
+				gameContainer.remove();
+			//remove the game from localStorge
+			localStorage.removeItem(userName);
+			clearInterval(updateBoardInterval);
+			main();
+		});
+	}

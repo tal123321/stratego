@@ -10,37 +10,52 @@
         <title>Stratego online game by Tal Divon</title>
 
         <!-- CSS FILES -->
-
-     
-
-
-
-
         <link href="css/bootstrap.min.css" rel="stylesheet">
-
         <link href="css/bootstrap-icons.css" rel="stylesheet">
-
         <link href="css/owl.carousel.min.css" rel="stylesheet">
-
         <link href="css/owl.theme.default.min.css" rel="stylesheet">
-
         <link href="css/tooplate-gotto-job.css" rel="stylesheet">
-        
+        <link rel="stylesheet" href="css/main.css" /> 
 		
+		<!-- JS FILES -->
         <script src="js/jquery.min.js"></script>
         <script src="js/owl.carousel.min.js"></script>
         <script src="js/counter.js"></script>
-        <script src="js/custom.js"></script>
-
+        <script src="js/custom.js"></script>		  
+		<script src="js/jquery-3.7.1.min.js"></script>
+		<script src="js/game.js"></script>
+		<script src="js/encription.js"></script>
+		<script src="js/boardFunctions.js"></script>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
 		
-		  <link rel="stylesheet" href="css/main.css" /> 
-		  <script src="js/jquery-3.7.1.min.js"></script>
-		  <script src="js/game.js"></script>
-		  <script src="js/boardFunctions.js"></script>
-		  <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
-
+    <!-- JavaScript FILES for ecryption-->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jsencrypt/3.2.1/jsencrypt.min.js"></script>
 
 		<script>
+			function checkExistedGame(){
+					let existGame = false;
+					//check if game already started
+					// Retrieve the values from localStorage
+					gameId = localStorage.getItem(userName);
+						
+					callServer("checkGameExist", gameId, function(response) {
+						if (gameId !== null && response == "True"){
+							//remove the top
+							document.getElementById('instructions').remove();
+							// create Board
+							createGame(10, 10);
+							//remove the ready to start game bottom
+							document.getElementById("startGame").remove();
+							updateBoard();
+							updateBoardInterval = setInterval(updateBoard, 1000);
+						}else{
+							main();
+						}
+					});
+			}
+			
+			
 			let userName;
 			function login(){
 				userName = document.querySelector('input[name="uname"]').value;
@@ -58,35 +73,19 @@
 					if (response == "True"){
 						var elementToRemove = document.getElementById("form");
 						elementToRemove.remove();
-						main();
+						checkExistedGame();
 					}else{
 						alert("user name or password is incorrect");
 					}
 				});	
 			}
 	
-		function hashPassword(password) {
-			return CryptoJS.SHA256(password).toString();
-		}
 		
-			function validateName(name) {
-				let isPasswordOk = "ok";
-				if (name.includes(' ')) {
-					isPasswordOk = "should not consist spaces";
-				}
-				if (name.length <= 3) {
-					isPasswordOk = "should be higher than 3";
-				}
-				if (name.length >= 16) {
-					isPasswordOk = "should be lower than 16";
-				}
-				return isPasswordOk;
-			}
 		</script>
 
     </head>
     
-    <body>
+    <body onload="exchangeKeys()">
 
         <nav class="navbar navbar-expand-lg">
             <div class="container" id = "top">

@@ -1,6 +1,6 @@
 import threading
 import time
-
+import sqlite3
 
 class card:
     def __init__(self, kind, player=0, show=False):
@@ -30,10 +30,10 @@ class card:
     def copy(self, other):
         self.kind = other.kind
         self.player = other.player
-        self.show = show
+        self.show = other.show
 
     def shouldShow(self, player):
-        return str(self.player) == str(player) or str(self.getPlayer()) == "0" or self.show
+        return str(self.player) == str(player) or str(self.player) == "0" or self.show
 
 
 class Board:
@@ -44,7 +44,7 @@ class Board:
         for row in range(rows):
             current_row = []
             for col in range(columns):
-                cell_content = self.determineCellContent(row + 1, col + 1)
+                cell_content = self.determineCellContent(row, col)
                 if row < 4:
                     current_row.append(card(cell_content, playerUp))
                 elif row > 5:
@@ -81,19 +81,21 @@ class Board:
             # incase of a bomb only card 3 survives
             if placeFrom.getKind() == "image3":
                 self.board[toRow][toCol] = self.board[fromRow][fromCol]
+                a = self.board[toRow][toCol]
             else:
                 placeTo.copy(card("green"))
-            placeFrom.copy(card("green"))
         # if there is an enemy card or a one attacking a nine
         elif (placeFrom.getKind()[-1] > placeTo.getKind()[-1]) or (
                 placeFrom.getKind()[-1] == "1" and placeTo.getKind()[-1] == "9"):
             self.board[toRow][toCol] = self.board[fromRow][fromCol]
         elif placeFrom.getKind()[-1] == placeTo.getKind()[-1]:
             placeTo.copy(card("green"))
+        a = self.board[toRow][toCol]
         self.board[fromRow][fromCol] = card("green")
         # game is not over
         showCard = showCardThread(self.board[toRow][toCol])
         showCard.start()
+        a = self.board[toRow][toCol]
         return False
 
     def getBoardAsArray(self, player):
@@ -114,31 +116,22 @@ class Board:
 
     @staticmethod
     def determineCellContent(row, col):
-        if (row == 7 and col == 1) or (row == 4 and col == 1):
-            return "image1"
-        elif (row == 7 and col < 10) or (row == 4 and col < 10):
-            return "image2"
-        elif ((row == 7) or (row == 8 and col < 5)) or (row == 4 or (row == 3 and col < 5)):
-            return "image3"
-        elif (row == 8 and col < 9) or (row == 3 and col < 9):
-            return "image4"
-        elif (row == 8 or (row == 9 and col < 3)) or (row == 3 or (row == 2 and col < 3)):
-            return "image5"
-        elif (row == 9 and col < 7) or (row == 2 and col < 7):
-            return "image6"
-        elif (row == 9 and col < 10) or (row == 2 and col < 10):
-            return "image7"
-        elif (row == 9 or (row == 10 and col == 1)) or (row == 2 or (row == 1 and col == 1)):
-            return "image8"
-        elif (row == 10 and col in [2, 3]) or (row == 1 and col in [2, 3]):
-            return "image9"
-        elif (row == 10 and col < 10) or (row == 1 and col < 10):
-            return "bomb"
-        elif row == 10 or row == 1:
-            return "flag"
-        elif row in [5, 6] and col in [3, 4, 7, 8]:
-            return "blue"
-        return "green"
+        # Connect to SQLite database
+        conn = sqlite3.connect("database")
+        cursor = conn.cursor()
+
+        query = f"SELECT col{col} FROM basicBoard LIMIT 1 OFFSET ?"
+        # Execute the query with the given row (adjust for zero-based index)
+        cursor.execute(query, (row,))
+
+        # Fetch the result
+        result = cursor.fetchone()
+
+        # Close the connection
+        conn.close()
+
+        # Return the result
+        return result[0]
 
     def switchCards(self, fromRow, fromCol, toRow, toCol):
         tempCard = card(self.board[toRow][toCol].getKind(), self.board[toRow][toCol].getPlayer())
@@ -147,6 +140,41 @@ class Board:
 
     def getCardOwner(self,row,col):
         return self.board[row][col].getPlayer()
+
+    def checkLegalMove(self, row1, col1, row2, col2,player):
+        card = self.board[row1][col1]
+        if card.getPlayer() != player or "image" not in card.getKind() or self.board[row2][col2].getKind() == "blue":
+            return False
+
+        # Calculate the absolute difference between rows and columns
+        row_diff = abs(row2 - row1)
+        col_diff = abs(col2 - col1)
+
+        # If the difference in rows or columns is more than 1
+        if row_diff > 1 or col_diff > 1:
+            # If the card is not a 2, return False
+            if "2" not in card.getKind():
+                return False
+            else:
+                # If the card is a 2, it can jump more than one tile
+                # Check if it's a valid jump (only vertical or horizontal)
+                if row_diff > 0 and col_diff > 0:
+                    return False  # Diagonal jump is not allowed
+
+                # Check if there are cards between initial and final positions
+                if row_diff == 0:  # Horizontal jump
+                    start_col = min(col1, col2)
+                    end_col = max(col1, col2)
+                    for col in range(start_col + 1, end_col):
+                        if "green" not in  self.board[row][col1].getKind():
+                            return False  # Invalid jump over non-green or non-blue cards
+                elif col_diff == 0:  # Vertical jump
+                    start_row = min(row1, row2)
+                    end_row = max(row1, row2)
+                    for row in range(start_row + 1, end_row):
+                        if "green" not in self.board[row][col1].getKind():
+                            return False  # Invalid jump over non-green or non-blue cards
+        return True
 
 
 class showCardThread(threading.Thread):

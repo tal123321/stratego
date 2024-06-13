@@ -6,39 +6,52 @@ from game import game
 import string
 import sqlite3
 import json
+from Crypto.Cipher import AES
+from Crypto.Random import get_random_bytes
+from base64 import b64encode, b64decode
+import rsa
+import urllib.parse
 
 PORT = 8000
-
 playersWaiting = []
 startGame = False
 games = {}
 randomId = ""
+semetricKey = ""
 
 
 class MyHandler(http.server.BaseHTTPRequestHandler):
     def do_GET(self):
-        global playersWaiting, startGame, games, randomId
+        global playersWaiting, startGame, games, randomId, semetricKey
         response = ""
         params = self.parse_QS()  # Parse query parameters
         action = params.get("action")
-        value = params.get("value")
+        value = urllib.parse.unquote(params.get("value"))
         player_id = params.get("clientId")
         gameId = params.get("game_Id")
 
         if action == "login":
             # check if the user exist
-            # Replace "%20" with space
-            value = value.replace("%20", " ")
             response = str(self.check_credentials(value.split()[0], value.split()[1]))
+        elif action == "checkGameExist":
+            response = str(value in games)
         elif action == "signUp":
-            # Replace "%20" with space
-            value = value.replace("%20", " ")
             response = self.sign_up(value.split()[0], value.split()[1])
+        elif action == "getRating":
+            response = games[gameId].getRating(player_id)
         elif action == "sendText":
             games[gameId].sendText(player_id, value)
+        elif action == "resign":
+            games[gameId].resign(player_id)
+
+        elif action == "sendSemetricKey":
+            print(value)
+            semetricKey = urllib.parse.unquote(value)
+            # publicKey = self.encrypt_data("hi",urllib.parse.unquote(value))
+            # print(response)
 
         elif action == "playTurn":
-            games[gameId].playTurn(value)
+            response = games[gameId].playTurn(value,player_id)
 
         elif action == "lookingForGame":
             if player_id in playersWaiting and startGame:
@@ -60,18 +73,16 @@ class MyHandler(http.server.BaseHTTPRequestHandler):
             response = {}  # board,chat,time
             response["board"] = games[gameId].getBoardAsArray(player_id)
             response["chat"] = games[gameId].getText()
-            response["time"] = games[gameId].getTime()
+            response["time1"] = games[gameId].getOtherTime(player_id)
+            response["time2"] = games[gameId].getTime(player_id)
             if isinstance(response, list) and games[gameId].deletePlayer(player_id):
                 # if reached here it means both player got the message and we can erase the game
                 games.pop(gameId, None)
             else:
                 response = json.dumps(response)
 
-        elif action == "isMyTurn":
-            response = str(games[gameId].turn == player_id)
-
-        elif action == "switchCards":
-            games[gameId].switchCards(value, player_id)
+        elif action == "readyStartGame":
+            games[gameId].readyStartGame(player_id)
 
         self.send_response(200)
         self.send_header("Content-type", "text/plain")
@@ -111,29 +122,59 @@ class MyHandler(http.server.BaseHTTPRequestHandler):
     def sign_up(self, username, password):
         # Connect to the database
         conn = sqlite3.connect("database")
-        curr = conn.cursor()
+        cursor = conn.cursor()
 
-        # check if username already exists
-        check_query = '''SELECT COUNT(*) FROM usersInfo WHERE username = ?;'''
-        curr.execute(check_query, (username,))
+        # Check if username already exists
+        check_query = "SELECT COUNT(*) FROM usersInfo WHERE username = ?;"
+        cursor.execute(check_query, (username,))
+        result = cursor.fetchone()[0]
 
-        # Fetch the result of the query
-        result = curr.fetchone()[0]
         if result == 1:
-            return "False"
+            conn.close()
+            return "False"  # Username already exists, return False
 
-        # create and use the query to add the user to the database
-        insert_query = '''INSERT INTO usersInfo (username, password) VALUES (?, ?);'''
-        curr.execute(insert_query, (username, password))
+        # Insert the user into the database and set default rating for the user
+        insert_query = "INSERT INTO usersInfo (username, password, rating) VALUES (?, ?, 100);"
+        cursor.execute(insert_query, (username, password))
 
         # Commit the changes
         conn.commit()
 
         # Close the connection
-        curr.close()
         conn.close()
 
-        return "True"  # if the user was added to the database
+        return "True"  # User successfully signed up, return True
+
+    def decrypt_data(self, enc_data, key_SYMETRIC):
+        # Split the received data (assuming colon separates iv and message)
+        enc_iv, enc_msg = enc_data.split(":", 1)
+
+        # Decode base64 only on the message part
+        enc_msg = b64decode(enc_msg)
+
+        # Convert key_SYMETRIC to bytes if it's a string
+        if isinstance(key_SYMETRIC, str):
+            key_SYMETRIC = key_SYMETRIC.encode('utf-8')
+
+        # Decrypt the data using AES-CBC
+        cipher = AES.new(key_SYMETRIC, AES.MODE_CBC, b64decode(enc_iv))
+        decrypted_data = cipher.decrypt(enc_msg)
+
+        # Remove padding from the decrypted data
+        plain_txt = decrypted_data.rstrip(b'\x00').decode('utf-8')
+        return plain_txt
+
+    def encrypt_data(self, new_data, key_SYMETRIC):
+        pad = lambda s: s + (16 - len(s) % 16) * bytes(chr(16 - len(s) % 16), 'utf-8')
+        raw = pad(new_data.encode('utf-8'))
+
+        key_SYMETRIC = b64decode(key_SYMETRIC)  # Decode the base64 key
+        cipher = AES.new(key_SYMETRIC, AES.MODE_CBC)
+        cipher_bytes = cipher.encrypt(raw)
+        iv = b64encode(cipher.iv).decode('utf-8')
+        ct = b64encode(cipher_bytes).decode('utf-8')
+        iv_ct = iv + ct
+        return iv_ct
 
 
 with socketserver.TCPServer(("", PORT), MyHandler) as httpd:
