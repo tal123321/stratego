@@ -17,6 +17,12 @@
 		button.id = "idToRemove";
         document.getElementById('left_div').appendChild(button);
         button.addEventListener('click', () => {  
+			//create loading div
+			const loaderDiv = document.createElement('div');
+			loaderDiv.className = 'loader';
+			loaderDiv.id = 'loader';
+			document.getElementById('left_div').appendChild(loaderDiv);
+			
 			document.getElementById('idToRemove').remove();
             refreshIntervalId = setInterval(function() {
 				checkStartGame();
@@ -71,7 +77,7 @@ function sendText() {
 		});
 	}
 }
-
+let instructionsHtml;
 let updateBoardInterval;
 function checkStartGame() {
         callServer("lookingForGame", "", function(response) {
@@ -83,9 +89,19 @@ function checkStartGame() {
 				//stop calling checkStartGame
                 clearInterval(refreshIntervalId);
 				
-				//remove the top
-				document.getElementById('instructions').remove();
+				//remove the top and the loading div if they 
+				const instructions = document.getElementById('instructions');
+				instructionsHtml = instructions.outerHTML;
+				const loader = document.getElementById('loader');
 				
+				if (instructions) {
+					instructions.remove();
+				}
+				
+				if (loader) {
+					loader.remove();
+				}
+			
 				// create Board
 				createGame(10, 10);
 				updateBoard();

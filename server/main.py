@@ -34,7 +34,11 @@ class MyHandler(http.server.BaseHTTPRequestHandler):
             # check if the user exist
             response = str(self.check_credentials(value.split()[0], value.split()[1]))
         elif action == "checkGameExist":
-            response = str(value in games)
+            checkIfGameExist = str(value in games)
+            if checkIfGameExist == "True":
+                response = json.dumps([checkIfGameExist,str(games[value].status == "not started")])
+            else:
+                response = json.dumps([checkIfGameExist, "False"])
         elif action == "signUp":
             response = self.sign_up(value.split()[0], value.split()[1])
         elif action == "getRating":

@@ -34,19 +34,20 @@
 
 		<script>
 			function checkExistedGame(){
-					let existGame = false;
 					//check if game already started
 					// Retrieve the values from localStorage
 					gameId = localStorage.getItem(userName);
 						
 					callServer("checkGameExist", gameId, function(response) {
-						if (gameId !== null && response == "True"){
+						response = JSON.parse(response)
+						if (gameId !== null && response[0] == "True"){
 							//remove the top
 							document.getElementById('instructions').remove();
 							// create Board
 							createGame(10, 10);
 							//remove the ready to start game bottom
-							document.getElementById("startGame").remove();
+							if (response[1] == "False")
+								document.getElementById("startGame").remove();
 							updateBoard();
 							updateBoardInterval = setInterval(updateBoard, 1000);
 						}else{

@@ -198,7 +198,7 @@ class showTimeThread(threading.Thread):
         self.game.status = "going"
 
         # after the game started
-        self.time = 5
+        self.time = 300
         while self.time > 0:
             time.sleep(1)
             if self.game.getTurn() == self.player:

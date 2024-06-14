@@ -74,7 +74,7 @@
     // Create the textContainer div
     var textContainer = document.createElement("div");
     textContainer.setAttribute("id", "textContainer");
-    textContainer.setAttribute("style", "border: 1px solid black; padding: 10px; margin-bottom: 10px;");
+    textContainer.setAttribute("style", "border: 1px solid black; padding: 10px; margin-bottom: 10px; width: 1000; height: 100px; overflow-y: auto;");
 
     // Create an input element for text input
     var inputText = document.createElement("input");
@@ -169,8 +169,13 @@ function updateBoard(){
 		}
 		
 		//update the chat
-		if (chat != "")
-			document.getElementById("textContainer").innerHTML = chat + "<br />";
+		if (chat != "") {
+        var sentences = chat.split("<br />");
+        if (sentences.length > 5) {
+            sentences = sentences.slice(-5);
+        }
+        document.getElementById("textContainer").innerHTML = sentences.join("<br />") + "<br />";
+		}
 		
 		//update the time
 		document.getElementById("clock1").innerHTML = timeFirstPlayer;
@@ -194,6 +199,8 @@ function gameOver(winner){
 	else
 		alert("you lost");
 	// Check if the element with id 'contain_game' exists
+	document.getElementById("left_div").insertAdjacentHTML('beforeend', instructionsHtml);
+    instructionsHtml = null;
 	var gameContainer = document.getElementById("contain_game");
 	if (gameContainer) 
 		gameContainer.remove();
