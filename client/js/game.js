@@ -10,26 +10,31 @@
 			});
 		}
 	}
+let startGameButton;
     function main() {
-        // Create a button to start the game
-        const button = document.createElement('button');
-        button.innerText = 'Start Game';
-		button.id = "idToRemove";
-        document.getElementById('left_div').appendChild(button);
-        button.addEventListener('click', () => {  
-			//create loading div
-			const loaderDiv = document.createElement('div');
-			loaderDiv.className = 'loader';
-			loaderDiv.id = 'loader';
-			document.getElementById('left_div').appendChild(loaderDiv);
-			
-			document.getElementById('idToRemove').remove();
-            refreshIntervalId = setInterval(function() {
-				checkStartGame();
-            }, 1000);
-        });
-    }
+		// Create a button to start the game
+		startGameButton = document.createElement('button');
+		startGameButton.innerText = 'Start Game';
+		startGameButton.id = 'startGameButton';
+		document.getElementById('left_div').appendChild(startGameButton);
 
+		startGameButton.addEventListener('click', waitForGame);
+	}
+function waitForGame(){
+	// Create loading div
+        const loaderDiv = document.createElement('div');
+        loaderDiv.className = 'loader';
+        loaderDiv.id = 'loader';
+        document.getElementById('left_div').appendChild(loaderDiv);
+
+        // Remove start game button
+        startGameButton.remove();
+
+        // Start game logic
+        refreshIntervalId = setInterval(function() {
+            checkStartGame();
+        }, 1000);
+}
 async function callServer(actionToDo, valueToPass, callback) {
     // encrypt message
 	let encryptedValue = valueToPass;

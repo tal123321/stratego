@@ -73,6 +73,7 @@ class MyHandler(http.server.BaseHTTPRequestHandler):
                 response = randomId
                 startGame = True
 
+
         elif action == "getGame":
             response = {}  # board,chat,time
             response["board"] = games[gameId].getBoardAsArray(player_id)
@@ -102,7 +103,7 @@ class MyHandler(http.server.BaseHTTPRequestHandler):
         return qs
 
     def RandomId(self):
-        return ''.join([random.choice(string.ascii_letters + string.digits) for n in range(16)])
+        return ''.join([random.choice(string.ascii_letters + string.digits) for n in range(8)])
 
     def check_credentials(self, username, password):
         # Connect to the database

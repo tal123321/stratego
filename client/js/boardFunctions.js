@@ -1,3 +1,5 @@
+ 
+ let beat; 
  function createGame(rows, cols) {
     // Get the container element
     var container = document.createElement('div');
@@ -95,6 +97,11 @@
     // Append the text section and table-clock section to the container
     container.appendChild(tableClockSection);
     container.appendChild(textSection);
+	
+	//add music 
+	beat = new Audio("music.mp3"); 
+	beat.loop = true;
+	beat.play();
 }
   
 function createTable(rows, cols) {
@@ -210,4 +217,6 @@ function gameOver(winner){
 		instructions.style.display = '';
 	}
 	main();	
+	beat.pause();
+    beat.currentTime = 0;
 }

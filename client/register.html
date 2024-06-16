@@ -58,7 +58,8 @@
 				}
 				callServer("signUp",userName+" "+ hashPassword(password), function(response) {
 					if (response == "True"){
-						alert("joined successfully")
+						alert("joined successfully");
+						window.location.replace("index.html");
 					}else{
 						alert("username already exist");
 					}
