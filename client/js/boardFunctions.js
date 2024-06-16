@@ -152,7 +152,7 @@ function updateBoard(){
 		
 		if (!Array.isArray(board)){
 			// if the first one is not an array it means game is over
-			gameOver(board);
+			gameOver(board == userName);
 			return;
 		}
 		
@@ -194,16 +194,20 @@ function gameOver(winner){
 	//remove the game from localStorge
 	 localStorage.removeItem(userName);
 	 
-	if (userName == winner)
+	if (winner)
 		alert("you won");
 	else
 		alert("you lost");
 	// Check if the element with id 'contain_game' exists
-	document.getElementById("left_div").insertAdjacentHTML('beforeend', instructionsHtml);
-    instructionsHtml = null;
 	var gameContainer = document.getElementById("contain_game");
 	if (gameContainer) 
 		gameContainer.remove();
 	clearInterval(updateBoardInterval);
+	//remove the top and the loading div if they 
+	let instructions = document.getElementById('instructions');
+				
+	if (instructions) {
+		instructions.style.display = '';
+	}
 	main();	
 }

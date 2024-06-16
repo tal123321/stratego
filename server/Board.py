@@ -166,7 +166,7 @@ class Board:
                     start_col = min(col1, col2)
                     end_col = max(col1, col2)
                     for col in range(start_col + 1, end_col):
-                        if "green" not in  self.board[row][col1].getKind():
+                        if "green" not in  self.board[row1][col1].getKind():
                             return False  # Invalid jump over non-green or non-blue cards
                 elif col_diff == 0:  # Vertical jump
                     start_row = min(row1, row2)

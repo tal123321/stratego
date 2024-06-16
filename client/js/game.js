@@ -77,8 +77,7 @@ function sendText() {
 		});
 	}
 }
-let instructionsHtml;
-let updateBoardInterval;
+var updateBoardInterval;
 function checkStartGame() {
         callServer("lookingForGame", "", function(response) {
             if (response != "") {
@@ -90,12 +89,11 @@ function checkStartGame() {
                 clearInterval(refreshIntervalId);
 				
 				//remove the top and the loading div if they 
-				const instructions = document.getElementById('instructions');
-				instructionsHtml = instructions.outerHTML;
+				let instructions = document.getElementById('instructions');
 				const loader = document.getElementById('loader');
 				
 				if (instructions) {
-					instructions.remove();
+					instructions.style.display = 'none';
 				}
 				
 				if (loader) {
@@ -116,13 +114,6 @@ function checkStartGame() {
     }
 	function resign(){
 		callServer("resign","", function(response) {
-			 // Check if the element with id 'contain_game' exists
-			  var gameContainer = document.getElementById("contain_game");
-			  if (gameContainer) 
-				gameContainer.remove();
-			//remove the game from localStorge
-			localStorage.removeItem(userName);
-			clearInterval(updateBoardInterval);
-			main();
+			 gameOver(false);
 		});
 	}

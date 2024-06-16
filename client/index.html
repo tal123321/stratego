@@ -42,7 +42,8 @@
 						response = JSON.parse(response)
 						if (gameId !== null && response[0] == "True"){
 							//remove the top
-							document.getElementById('instructions').remove();
+							let instructions = document.getElementById('instructions');
+							instructions.style.display = '';
 							// create Board
 							createGame(10, 10);
 							//remove the ready to start game bottom
